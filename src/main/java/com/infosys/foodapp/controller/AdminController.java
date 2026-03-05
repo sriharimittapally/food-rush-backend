@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/admin")
-@PreAuthorize("hasRole('ADMIN')")       // ← applies to ALL methods in this controller
+@PreAuthorize("hasRole('ADMIN')")
 @Tag(name = "Admin", description = "Admin management APIs")
 public class AdminController {
 

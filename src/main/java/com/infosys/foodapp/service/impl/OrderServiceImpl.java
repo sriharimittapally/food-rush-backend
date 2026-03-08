@@ -190,7 +190,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = getOrderById(orderId);
         User user = getUserByEmail(userEmail);
 
-        // Security — customer can only see their own orders
+        // Security — customer can only see  own orders
         // Restaurant owner can see their restaurant's orders
         boolean isCustomer = order.getCustomer().getId().equals(user.getId());
         boolean isOwner = order.getRestaurant()

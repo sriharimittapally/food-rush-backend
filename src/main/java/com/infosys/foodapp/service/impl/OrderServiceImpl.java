@@ -40,7 +40,7 @@ public class OrderServiceImpl implements OrderService {
         this.messagingTemplate = messagingTemplate;
     }
 
-    // ─── Helpers ──────────────────────────────────────────────
+    // ───  ──────────────────────────────────────────────
 
     private User getUserByEmail(String email) {
         return userRepository.findByEmail(email)

@@ -48,6 +48,9 @@ public class Restaurant {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(nullable = false)
+    private boolean deleted = false;
+
     // ─── Relationships ───────────────────────────────────────
 
     @OneToOne

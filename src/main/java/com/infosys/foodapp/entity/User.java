@@ -2,6 +2,7 @@ package com.infosys.foodapp.entity;
 
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.infosys.foodapp.enums.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -37,6 +38,9 @@ public class User implements UserDetails {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Column
+    private String imageUrl;
+
     @NotBlank
     @Column(nullable = false)
     private String password;
@@ -51,6 +55,7 @@ public class User implements UserDetails {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @JsonProperty("active")
     private boolean isActive = true;
 
     // ─── Relationships ───────────────────────────────────────

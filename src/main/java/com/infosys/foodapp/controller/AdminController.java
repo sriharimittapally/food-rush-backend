@@ -1,9 +1,9 @@
 package com.infosys.foodapp.controller;
 
-import com.infosys.foodapp.dto.response.AdminDashboardResponse;
-import com.infosys.foodapp.dto.response.RestaurantRevenueResponse;
-import com.infosys.foodapp.dto.response.UserResponse;
+import com.infosys.foodapp.dto.response.*;
 import com.infosys.foodapp.service.AdminService;
+import com.infosys.foodapp.service.OrderService;
+import com.infosys.foodapp.service.RestaurantService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
@@ -20,10 +20,16 @@ public class AdminController {
 
     private final AdminService adminService;
 
-    public AdminController(AdminService adminService) {
-        this.adminService = adminService;
-    }
+    private final RestaurantService restaurantService;
+    private final OrderService orderService;
 
+    public AdminController(AdminService adminService,
+                           RestaurantService restaurantService,
+                           OrderService orderService) {
+        this.adminService       = adminService;
+        this.restaurantService  = restaurantService;
+        this.orderService       = orderService;
+    }
     @GetMapping("/dashboard")
     @Operation(summary = "Get admin dashboard stats")
     public ResponseEntity<AdminDashboardResponse> getDashboard() {
@@ -49,6 +55,18 @@ public class AdminController {
         return ResponseEntity.ok(adminService.blockUnblockUser(userId));
     }
 
+    @GetMapping("/restaurants")
+    @Operation(summary = "Get all restaurants")
+    public ResponseEntity<List<RestaurantResponse>> getAllRestaurants() {
+        return ResponseEntity.ok(restaurantService.getAllRestaurants());
+    }
+
+    @GetMapping("/orders")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Get all orders (Admin)")
+    public ResponseEntity<List<OrderResponse>> getAllOrders() {
+        return ResponseEntity.ok(orderService.getAllOrders());
+    }
     @GetMapping("/revenue-report")
     @Operation(summary = "Get revenue report for all restaurants")
     public ResponseEntity<List<RestaurantRevenueResponse>> getRevenueReport() {

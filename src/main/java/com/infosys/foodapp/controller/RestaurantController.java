@@ -67,6 +67,14 @@ public class RestaurantController {
         return ResponseEntity.ok(
                 restaurantService.createRestaurant(request, userDetails.getUsername()));
     }
+    @GetMapping("/api/restaurant-owner/my-restaurant")
+    @PreAuthorize("hasRole('RESTAURANT_OWNER')")
+    @Operation(summary = "Get my restaurant")
+    public ResponseEntity<RestaurantResponse> getMyRestaurant(
+            @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(
+                restaurantService.getMyRestaurant(userDetails.getUsername()));
+    }
 
     @PutMapping("/api/restaurant-owner/update")
     @PreAuthorize("hasRole('RESTAURANT_OWNER')")

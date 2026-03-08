@@ -11,7 +11,7 @@ public interface RestaurantService {
     RestaurantResponse createRestaurant(RestaurantRequest request, String ownerEmail);
     RestaurantResponse updateRestaurant(RestaurantRequest request, String ownerEmail);
     RestaurantResponse toggleOpenStatus(String ownerEmail);
-
+     RestaurantResponse getMyRestaurant(String ownerEmail);
     // Public
     List<RestaurantResponse> getAllRestaurants();
     RestaurantResponse getRestaurantById(Long id);

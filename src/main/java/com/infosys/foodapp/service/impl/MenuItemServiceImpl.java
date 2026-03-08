@@ -131,9 +131,16 @@ public class MenuItemServiceImpl implements MenuItemService {
 
     @Override
     public void deleteMenuItem(Long itemId, String ownerEmail) {
-        MenuItem item = getMenuItemById(itemId);
-        verifyOwnership(item, ownerEmail);   // security check
-        menuItemRepository.delete(item);
+        MenuItem item = menuItemRepository.findById(itemId)
+                .orElseThrow(() -> new RuntimeException("Menu item not found"));
+
+        if (!item.getRestaurant().getOwner().getEmail().equals(ownerEmail)) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        item.setDeleted(true);
+        item.setAvailable(false);
+        menuItemRepository.save(item);
     }
 
     // ─── Toggle Availability ──────────────────────────────────
@@ -152,18 +159,17 @@ public class MenuItemServiceImpl implements MenuItemService {
     @Override
     public List<MenuItemResponse> getMenuByRestaurant(Long restaurantId) {
         Restaurant restaurant = getRestaurantById(restaurantId);
-        return menuItemRepository.findByRestaurant(restaurant)
+        return menuItemRepository.findByRestaurantAndDeletedFalse(restaurant)
                 .stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
-    // ─── Get Only Available Items (Public) ───────────────────
-
     @Override
     public List<MenuItemResponse> getAvailableMenu(Long restaurantId) {
         Restaurant restaurant = getRestaurantById(restaurantId);
-        return menuItemRepository.findByRestaurantAndIsAvailableTrue(restaurant)
+        return menuItemRepository
+                .findByRestaurantAndIsAvailableTrueAndDeletedFalse(restaurant)
                 .stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());

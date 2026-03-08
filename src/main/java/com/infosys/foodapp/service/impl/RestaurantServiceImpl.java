@@ -39,6 +39,13 @@ public class RestaurantServiceImpl implements RestaurantService {
                         new RuntimeException("Restaurant not found with id: " + id));
     }
 
+
+    public RestaurantResponse getMyRestaurant(String ownerEmail) {
+        Restaurant restaurant = restaurantRepository
+                .findByOwnerEmail(ownerEmail)
+                .orElseThrow(() -> new RuntimeException("No restaurant found"));
+        return mapToResponse(restaurant);
+    }
     // ─── Helper: Entity → Response DTO ───────────────────────
 
     private RestaurantResponse mapToResponse(Restaurant r) {
@@ -128,6 +135,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     public List<RestaurantResponse> getAllRestaurants() {
         return restaurantRepository.findAll()
                 .stream()
+                .filter(r -> !r.isDeleted())   // ← exclude deleted
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
@@ -163,7 +171,12 @@ public class RestaurantServiceImpl implements RestaurantService {
 
     @Override
     public void deleteRestaurant(Long id) {
-        Restaurant restaurant = getRestaurantEntityById(id);
-        restaurantRepository.delete(restaurant);
+        Restaurant restaurant = restaurantRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Restaurant not found"));
+
+        // soft delete
+        restaurant.setDeleted(true);
+        restaurant.setOpen(false);
+        restaurantRepository.save(restaurant);
     }
 }

@@ -35,6 +35,7 @@ public class UserServiceImpl implements UserService {
                 .email(user.getEmail())
                 .phone(user.getPhone())
                 .role(user.getRole())
+                .imageUrl(user.getImageUrl())
                 .isActive(user.isActive())
                 .createdAt(user.getCreatedAt())
                 .build();
@@ -50,19 +51,19 @@ public class UserServiceImpl implements UserService {
     // ─── Update Profile ───────────────────────────────────────
 
     @Override
-    public UserResponse updateProfile(UpdateProfileRequest request,
-                                      String email) {
-        User user = getUserByEmail(email);
+    public UserResponse updateProfile(UpdateProfileRequest req, String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Check phone not taken by someone else
-        if (!user.getPhone().equals(request.getPhone()) &&
-                userRepository.existsByPhone(request.getPhone())) {
-            throw new RuntimeException(
-                    "Phone number already in use by another account");
-        }
+        if (req.getFullName() != null && !req.getFullName().isBlank())
+            user.setFullName(req.getFullName());
 
-        user.setFullName(request.getFullName());
-        user.setPhone(request.getPhone());
+        if (req.getPhone() != null && !req.getPhone().isBlank())
+            user.setPhone(req.getPhone());
+
+        // ← make sure this is here
+        if (req.getImageUrl() != null && !req.getImageUrl().isBlank())
+            user.setImageUrl(req.getImageUrl());
 
         return mapToResponse(userRepository.save(user));
     }

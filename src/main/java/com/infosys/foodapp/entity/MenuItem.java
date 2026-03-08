@@ -40,6 +40,10 @@ public class MenuItem {
     @Column(nullable = false)
     private boolean isAvailable = true;
 
+    // Add this field to your MenuItem entity
+    @Column(nullable = false)
+    private boolean deleted = false;
+
     // ─── Relationships ───────────────────────────────────────
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -11,6 +11,7 @@ import com.infosys.foodapp.repository.*;
 import com.infosys.foodapp.service.OrderService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,17 +25,19 @@ public class OrderServiceImpl implements OrderService {
     private final UserRepository userRepository;
     private final RestaurantRepository restaurantRepository;
     private final MenuItemRepository menuItemRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     public OrderServiceImpl(OrderRepository orderRepository,
                             OrderItemRepository orderItemRepository,
                             UserRepository userRepository,
                             RestaurantRepository restaurantRepository,
-                            MenuItemRepository menuItemRepository) {
+                            MenuItemRepository menuItemRepository, SimpMessagingTemplate messagingTemplate) {
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
         this.userRepository = userRepository;
         this.restaurantRepository = restaurantRepository;
         this.menuItemRepository = menuItemRepository;
+        this.messagingTemplate = messagingTemplate;
     }
 
     // ─── Helpers ──────────────────────────────────────────────
@@ -79,7 +82,7 @@ public class OrderServiceImpl implements OrderService {
 
         return OrderResponse.builder()
                 .id(order.getId())
-                .status(order.getStatus())
+                .status(order.getStatus().name())
                 .totalAmount(order.getTotalAmount())
                 .deliveryAddress(order.getDeliveryAddress())
                 .specialInstructions(order.getSpecialInstructions())
@@ -266,20 +269,20 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponse updateOrderStatus(Long orderId,
                                            UpdateOrderStatusRequest request,
                                            String ownerEmail) {
-        Order order = getOrderById(orderId);
-        User owner = getUserByEmail(ownerEmail);
-
-        // Verify this order belongs to owner's restaurant
-        if (!order.getRestaurant().getOwner().getId().equals(owner.getId())) {
-            throw new RuntimeException(
-                    "You are not authorized to update this order");
-        }
-
-        // Enforce valid status transitions
-        validateStatusTransition(order.getStatus(), request.getStatus());
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
 
         order.setStatus(request.getStatus());
-        return mapToResponse(orderRepository.save(order));
+        Order saved = orderRepository.save(order);
+        OrderResponse response = mapToResponse(saved);
+
+        // ← ADD THIS — broadcast to all subscribers of this order
+        messagingTemplate.convertAndSend(
+                "/topic/orders/" + orderId,
+                response
+        );
+
+        return response;
     }
 
     // ─── Status Transition Rules ──────────────────────────────

@@ -17,6 +17,11 @@ public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
     // Owner can fetch their own restaurant
     Optional<Restaurant> findByOwner(User owner);
 
+    Optional<Restaurant> findByOwnerEmail(String email);
+
+    List<Restaurant> findByDeletedFalse();
+    List<Restaurant> findByDeletedFalseAndOpenTrue();
+
     // Check if owner already has a restaurant
     boolean existsByOwner(User owner);
 

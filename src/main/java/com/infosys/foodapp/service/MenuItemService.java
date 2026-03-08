@@ -15,6 +15,7 @@ public interface MenuItemService {
     void deleteMenuItem(Long itemId, String ownerEmail);
     MenuItemResponse toggleAvailability(Long itemId, String ownerEmail);
 
+
     // Public
     List<MenuItemResponse> getMenuByRestaurant(Long restaurantId);
     List<MenuItemResponse> getAvailableMenu(Long restaurantId);

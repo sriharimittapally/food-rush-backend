@@ -110,10 +110,7 @@ public class OrderController {
     // ADMIN ROUTES
     // ════════════════════════════════════════════════
 
-    @GetMapping("/admin/orders")
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Get all orders (Admin)")
-    public ResponseEntity<List<OrderResponse>> getAllOrders() {
-        return ResponseEntity.ok(orderService.getAllOrders());
-    }
+
+
+
 }

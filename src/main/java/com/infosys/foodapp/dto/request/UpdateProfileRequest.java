@@ -16,4 +16,6 @@ public class UpdateProfileRequest {
     @Pattern(regexp = "^[0-9]{10}$",
             message = "Enter a valid 10-digit phone number")
     private String phone;
+
+    private String imageUrl;
 }

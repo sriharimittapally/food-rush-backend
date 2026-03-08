@@ -23,6 +23,12 @@ public interface MenuItemRepository extends JpaRepository<MenuItem, Long> {
     // Veg-only filter
     List<MenuItem> findByRestaurantAndIsVegTrue(Restaurant restaurant);
 
+    // replace existing findByRestaurant
+    List<MenuItem> findByRestaurantAndDeletedFalse(Restaurant restaurant);
+
+    // replace existing findByRestaurantAndIsAvailableTrue
+    List<MenuItem> findByRestaurantAndIsAvailableTrueAndDeletedFalse(Restaurant restaurant);
+
     // Check if item belongs to restaurant (security check)
     boolean existsByIdAndRestaurant(Long id, Restaurant restaurant);
 }
